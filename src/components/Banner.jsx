@@ -1,9 +1,7 @@
 import React from 'react';
 
 const Banner = ({ title }) => (
-  <header>
-    <h1>{title}</h1>
-  </header>
+  <h1 className='text-center m-4'>{title}</h1>
 );
 
 export default Banner;
