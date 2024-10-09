@@ -6,6 +6,8 @@ const CourseList = ({ courses }) => (
     { Object.values(courses).map(course => <Course key ={course.number} course={course} /> )}
   </div>
 )
+
+export default CourseList;
 // const CourseList = ({ courses }) => (
 //   <div>
 //     <ul>
@@ -19,4 +21,3 @@ const CourseList = ({ courses }) => (
 //   </div>
 // );
 
-export default CourseList;
