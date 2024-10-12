@@ -1,16 +1,11 @@
 import React from 'react';
+import '../Course.css';
 
-// const Course = ({ course }) => (
-//     <div className="card m-1 p-2">
-//       <div className="card-body">
-//         <div className="card-title">{ getCourseTerm(course) } CS { getCourseNumber(course) }</div>
-//         <div className="card-text">{ course.title }</div>
-//       </div>
-//     </div>
-//   );
-  
-const Course = ({ course }) => (
-    <div className="card m-1 p-2">
+const Course = ({ course, selected, toggleSelected }) => (
+    <div 
+        className={`card m-1 p-2 ${selected ? 'selected' : ''}`}
+        onClick={() => toggleSelected(course)}
+    >
         <div className='card-body'>
             <div className='card-title'>{course.term} CS {course.number}</div>
             <div className='card-text'>{course.title}</div>
