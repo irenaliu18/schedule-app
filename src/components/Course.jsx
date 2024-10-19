@@ -1,10 +1,11 @@
 import React from 'react';
 import '../Course.css';
 
-const Course = ({ course, selected, toggleSelected }) => (
+const Course = ({ course, selected, toggleSelected, selectable }) => (
     <div 
-        className={`card m-1 p-2 ${selected ? 'selected' : ''}`}
-        onClick={() => toggleSelected(course)}
+        className={`card m-1 p-2 ${selected ? 'selected' : ''} ${!selectable ? 'unselectable' : ''}`}
+        onClick={() => selectable && toggleSelected(course)}
+        style={{ backgroundColor: selectable ? 'white' : 'red'}}
     >
         <div className='card-body'>
             <div className='card-title'>{course.term} CS {course.number}</div>

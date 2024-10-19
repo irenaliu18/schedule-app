@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import { useState } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import './styling/App.css';
 import React from 'react';
 import Banner from './components/Banner';
 import CourseList from './components/CourseList';

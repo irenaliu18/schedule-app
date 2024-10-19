@@ -1,16 +1,31 @@
 import React, { useState } from 'react';
 import Course from './Course';
 import Modal from './Modal';
+import { hasTimeConflict } from '../../utils/conflicts';
 
 
 const CourseList = ({ courses }) => {
   const [term, setTerm] = useState('Fall');
   const [selectedCourses, setSelectedCourses] = useState([]);
+  
   const [modalOpen, setModalOpen] = useState(false);
 
   const termCourses = Object.values(courses).filter(course => term === course.term);
 
+  const isSelectable = (course) => {
+    if (selectedCourses.includes(course.number)){
+      return true;
+    }
+    return !selectedCourses.some(selectedCourseNumber => {
+      const selectedCourse = termCourses.find(c => c.number === selectedCourseNumber);
+      return hasTimeConflict(course, selectedCourse);
+    });
+  };
+
   const toggleSelected = (course) => {
+    if (!isSelectable(course) && !selectedCourses.includes(course.number)) {
+      return;
+    }
     setSelectedCourses(
       selectedCourses.includes(course.number)
       ? selectedCourses.filter(id => id !== course.number)
@@ -41,6 +56,7 @@ const CourseList = ({ courses }) => {
             key={course.number}
             course={course}
             selected={selectedCourses.includes(course.number)}
+            selectable={isSelectable(course)}
             toggleSelected={() => toggleSelected(course)}
           />
         ))}
