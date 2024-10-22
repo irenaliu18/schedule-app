@@ -6,9 +6,10 @@ import { hasTimeConflict } from '../../utils/conflicts';
 
 const CourseList = ({ courses }) => {
   const [term, setTerm] = useState('Fall');
-  const [selectedCourses, setSelectedCourses] = useState([]);
-  
+  const [selectedCourses, setSelectedCourses] = useState([]); 
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [formData, setFormData] = useState({ title: '', meets: ''});
 
   const termCourses = Object.values(courses).filter(course => term === course.term);
 
@@ -37,7 +38,26 @@ const CourseList = ({ courses }) => {
     setModalOpen(true);
     console.log('Modal Opened:', modalOpen); // Debugging: Ensure modal state is changing
   };
-  const closeModal = () => setModalOpen(false);
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingCourse(null);
+  };
+
+  const handleEdit = (course) => {
+    setEditingCourse(course);
+    setFormData({ title: course.title, meets: course.meets });
+    openModal();
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCancel = () => {
+    closeModal();
+  }
 
   const selectedCourseDetails = termCourses.filter(course => selectedCourses.includes(course.number));
 
@@ -63,21 +83,41 @@ const CourseList = ({ courses }) => {
       </div>
 
       <Modal open={modalOpen} close={closeModal}>
-        {selectedCourses.length === 0 ? (
+{editingCourse ? (
           <div>
-            <h3>No courses selected</h3>
-            <p>Select courses by clicking on them from the list.</p>
+            <h3>Edit Course</h3>
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div className="mb-3">
+                <label htmlFor="courseTitle" className="form-label">Course Title</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="courseTitle"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="courseMeets" className="form-label">Meeting Time</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="courseMeets"
+                  name="meets"
+                  value={formData.meets}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {/* Cancel button */}
+              <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+                Cancel
+              </button>
+            </form>
           </div>
         ) : (
           <div>
-            <h3>Selected Courses</h3>
-            <ul>
-              {selectedCourseDetails.map(course => (
-                <li key={course.number}>
-                  <strong>{course.number}:</strong> {course.title} - {course.meets}
-                </li>
-              ))}
-            </ul>
+            <h3>No course selected for editing</h3>
           </div>
         )}
       </Modal>
@@ -98,15 +138,15 @@ const TermSelector = ({term, setTerm}) => {
   const terms = ['Fall', 'Winter', 'Spring'];
 
   return (
-  <div className="btn-group">
-    {
-      Object.values(terms).map(value => (
-      <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
-      ))
-    }
-  </div>
-);
-  };
+    <div className="btn-group">
+      {
+        Object.values(terms).map(value => (
+        <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
+        ))
+      }
+    </div>
+  );
+};
 
 
 
