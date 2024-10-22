@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-// import { Link } from 'react-router-dom';
-import '../Course.css';
 
 const Course = ({ course, selected, toggleSelected, selectable, handleEdit }) => {
 

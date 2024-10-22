@@ -1,6 +1,4 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import logo from './logo.svg';
 import './styling/App.css';
 import React from 'react';
 import Banner from './components/Banner';
