@@ -78,12 +78,13 @@ const CourseList = ({ courses }) => {
             selected={selectedCourses.includes(course.number)}
             selectable={isSelectable(course)}
             toggleSelected={() => toggleSelected(course)}
+            handleEdit={handleEdit}
           />
         ))}
       </div>
 
       <Modal open={modalOpen} close={closeModal}>
-{editingCourse ? (
+        {editingCourse ? (
           <div>
             <h3>Edit Course</h3>
             <form onSubmit={(e) => e.preventDefault()}>

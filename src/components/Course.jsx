@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import '../Course.css';
 
-const Course = ({ course, selected, toggleSelected, selectable }) => {
+const Course = ({ course, selected, toggleSelected, selectable, handleEdit }) => {
 
     const [isHovered, setIsHovered] = useState(false);
     
@@ -20,9 +20,9 @@ const Course = ({ course, selected, toggleSelected, selectable }) => {
                 <div className='card-text'>{course.meets}</div>
 
                 {isHovered && (
-                    <Link to={`/courses/${course.number}/edit`} className="btn btn-primary">
+                    <button className="btn btn-primary" onClick={() => handleEdit(course)}>
                         Edit
-                    </Link>
+                    </button>
                 )}
             </div>
         </div>   
