@@ -8,17 +8,48 @@ const CourseForm = ({ courses }) => {
   const [title, setTitle] = useState(course ? course.title : '');
   const [term, setTerm] = useState(course ? course.term : '');
   const [meets, setMeets] = useState(course ? course.meets : '');
+
+  const [titleError, setTitleError] = useState('');
+  const [meetsError, setMeetsError] = useState('');
   
   const navigate = useNavigate();
 
+  const isValidMeetingTime = (meets) => {
+    if (meets === '') return true;
+    const meetsRegex = /^[MTWRF]{1,5} \d{1,2}:\d{2}-\d{1,2}:\d{2}$/;
+    return meetsRegex.test(meets);
+  };
+
+  const validateForm = () => {
+    let valid = true;
+
+    if (title.length < 2) {
+      setTitleError('Title must be at least 2 characters.');
+      valid = false;
+    } else {
+      setTitleError('');
+    }
+
+    if (!isValidMeetingTime(meets)){
+      setMeetsError('Must contain days and start-end, e.g., MWF 12:00 - 13:20');
+      valid = false;
+    } else {
+      setMeetsError('');
+    }
+    return valid;
+  };
+
+  
   const handleCancel = () => {
     navigate('/'); // return to the course list when cancel is clicked
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here we will handle form submission logic later
-    // For now, it does nothing
+    if (validateForm()) {
+      console.log('Form submitted with:', { title, term, meets });
+      navigate('/');
+    }
   };
 
   return (
@@ -31,6 +62,7 @@ const CourseForm = ({ courses }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        {titleError && <div className="text-danger">{titleError}</div>} {/* Display error */}
       </div>
       <div className="form-group">
         <label>Term</label>
@@ -49,11 +81,17 @@ const CourseForm = ({ courses }) => {
           value={meets}
           onChange={(e) => setMeets(e.target.value)}
         />
+        {meetsError && <div className="text-danger">{meetsError}</div>} {/* Display error */}
       </div>
 
-      <button type="button" className="btn btn-secondary" onClick={handleCancel}>
-        Cancel
-      </button>
+      <div className="button-group" style={{ marginTop: '20px' }}>
+  <button type="submit" className="btn btn-primary">
+    Submit
+  </button>
+  <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+    Cancel
+  </button>
+</div>
     </form>
   );
 };

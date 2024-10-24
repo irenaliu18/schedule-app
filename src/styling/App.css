@@ -109,4 +109,12 @@ button {
   font-size: 1.5rem;
   cursor: pointer;
 }
+button {
+  display: block !important;
+}
+
+.text-danger {
+  display: block !important;
+  color: red;
+}
 
