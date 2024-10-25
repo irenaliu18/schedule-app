@@ -3,9 +3,6 @@ import { getDatabase, onValue, ref, update } from "firebase/database";
 import { useEffect, useState } from "react";
 import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 
-
-
-
 // Your web app's Firebase configuration (replace with your own configuration)
 const firebaseConfig = {
     apiKey: "AIzaSyBGr5l2_MQWFJQZaQ9HnpW647Jfh1SLX2Q",

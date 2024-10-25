@@ -3,12 +3,8 @@ import { onValue, ref} from 'firebase/database';
 import { database, useAuth } from '../utilities/firebase'
 import './styling/App.css';
 import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Import from react-router-dom
-
 import Banner from './components/Banner';
 import CourseList from './components/CourseList';
-import CourseForm from './components/CourseForm';
-
 
 // Fetch the schedule data
 const fetchSchedule = async () => {

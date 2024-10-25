@@ -20,9 +20,11 @@ const haveTimeOverlay = (timeRange1, timeRange2) => {
 };
 
 export const hasTimeConflict = (course1, course2) => {
+    if (!course1 || !course2 || !course1.term || !course2.term) {
+        return false;  // Return false if any course object is undefined or lacks a `term`
+      }
     if (course1.term !== course2.term || !course1.meets || !course2.meets) {
         return false;
-
     } 
     const [days1, timeRange1] = course1.meets.split(' ');
     const [days2, timeRange2] = course2.meets.split(' ');

@@ -16,8 +16,5 @@ const Banner = ({ title }) => {
   );
 };
 export default Banner;
-// const Banner = ({ title }) => (
-//   <h1 className='text-center m-4'>{title}</h1>
-// );
 
 

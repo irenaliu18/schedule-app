@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../utilities/firebase';
-const Course = ({ course, selected, toggleSelected, selectable, handleEdit }) => {
+const Course = ({ course, selected, toggleSelected, selectable, isAdmin, handleEdit }) => {
     const user = useAuth();
     const [isHovered, setIsHovered] = useState(false);
     
@@ -16,8 +16,8 @@ const Course = ({ course, selected, toggleSelected, selectable, handleEdit }) =>
                 <div className='card-title'>{course.term} CS {course.number}</div>
                 <div className='card-text'>{course.title}</div>
                 <div className='card-text'>{course.meets}</div>
-
-                {isHovered && user && (
+                
+                {isHovered && isAdmin && (
                     <button className="btn btn-primary" onClick={() => handleEdit(course)}>
                         Edit
                     </button>

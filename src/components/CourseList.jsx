@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import Course from './Course';
 import CourseForm from './CourseForm';
 import CoursePlanModal from './CoursePlanModal';
@@ -7,24 +7,31 @@ import TermSelector from './TermSelector';
 import { hasTimeConflict } from '../../utilities/conflicts';
 import { database, useAuth } from '../../utilities/firebase';
 
-import { ref, update } from 'firebase/database'; // Make sure these are imported
+import { ref, update, onValue } from 'firebase/database'; 
 
 const CourseList = ({ courses }) => {
   const user = useAuth();
-
-  if (!courses) {
-    console.error('Courses prop is not defined:', courses);
-    return <div>No courses available</div>; // or any fallback UI
-  }
-
   const [term, setTerm] = useState('Fall');
   const [selectedCourses, setSelectedCourses] = useState([]); 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [formData, setFormData] = useState({ title: '', meets: ''});
+  const [course, setCourses] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      const adminRef = ref(database, `admin/${user.uid}`);
+      onValue(adminRef, (snapshot) => {
+        console.log("Admin path snapshot:", snapshot.val()); 
+        setIsAdmin(!!snapshot.val());
+        console.log("admin status", isAdmin);
+      });
+    }
+  }, [user]);
+  
   const termCourses = Object.values(courses).filter(course => term === course.term);
-
+  
   const isSelectable = (course) => {
     if (selectedCourses.includes(course.number)){
       return true;
@@ -48,7 +55,6 @@ const CourseList = ({ courses }) => {
 
   const openCoursePlanModal = () => {
     setModalOpen(true);
-    console.log('Modal Opened:', modalOpen); // Debugging: Ensure modal state is changing
   };
 
   const closeModal = () => {
@@ -57,22 +63,35 @@ const CourseList = ({ courses }) => {
   };
 
   const handleEdit = (course) => {
-    
-    if (!user) return alert('Please sign in to edit courses.');
-    console.log('Editing Course:', course);
-    setEditingCourse(course);
+
+    setEditingCourse({ ...course});
     setFormData({ title: course.title, meets: course.meets });
     setModalOpen(true);
   }
 
   const handleCourseFormSubmit = (updatedCourse) => {
-    const dbRef = ref(database, `courses/${updatedCourse.number}`); // Assuming number is unique
-    console.log('Updated Course', updatedCourse.number);
+    
+    const matchedKey = Object.keys(courses).find(key => key.includes(updatedCourse.number));
+
+    if (!matchedKey) {
+      console.error(`Course with ID ${updatedCourse.number} not found.`);
+      return;
+    }
+  
+    const dbRef = ref(database, `courses/${matchedKey}`);
+
     update(dbRef, {
       title: updatedCourse.title,
       meets: updatedCourse.meets,
     }).then(() => {
       console.log('Course updated successfully');
+      setCourses((prevCourses) => ({
+        ...prevCourses,
+        [matchedKey]: {
+          ...prevCourses[matchedKey],
+          ...updatedCourse
+        }
+      }));
     }).catch((error) => {
       console.error('Error updating course:', error);
     });
@@ -84,6 +103,9 @@ const CourseList = ({ courses }) => {
     closeModal();
   }
 
+  const selectedCourseDetails = Object.values(courses).filter(course => 
+    selectedCourses.includes(course.number)
+  );
 
   return (
     <>
@@ -102,18 +124,18 @@ const CourseList = ({ courses }) => {
             selected={selectedCourses.includes(course.number)}
             selectable={isSelectable(course)}
             toggleSelected={() => toggleSelected(course)}
+            isAdmin={isAdmin}
             handleEdit={handleEdit}
-            //user={user}
           />
         ))}
       </div>
 
-      {/* Use CoursePlanModal for displaying selected courses */}
+      {/* Displaying selected courses */}
       <CoursePlanModal
-        modalOpen={modalOpen && !editingCourse} // Open only when not editing a course
+        modalOpen={modalOpen && !editingCourse}
         closeModal={closeModal}
         selectedCourses={selectedCourses}
-        selectedCourseDetails={termCourses.filter(course => selectedCourses.includes(course.number))}
+        selectedCourseDetails={selectedCourseDetails}
       />
 
       {/* Modal for editing a course */}

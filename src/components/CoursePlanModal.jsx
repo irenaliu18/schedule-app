@@ -15,7 +15,7 @@ const CoursePlanModal = ({ modalOpen, closeModal, selectedCourses, selectedCours
           <ul>
             {selectedCourseDetails.map(course => (
               <li key={course.number}>
-                <strong>{course.number}:</strong> {course.title} - {course.meets}
+                <strong>{course.term} {"CS " + course.number}:</strong> {course.title} - {course.meets}
               </li>
             ))}
           </ul>
