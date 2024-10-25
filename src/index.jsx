@@ -5,14 +5,6 @@ import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter } from 'react-router-dom';
 
-// const queryClient = new QueryClient();
-
-// ReactDOM.render(
-//   <QueryClientProvider client={queryClient}>
-//     <App />
-//   </QueryClientProvider>,
-//   document.getElementById('root')
-// );
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
@@ -22,3 +14,13 @@ root.render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+// const queryClient = new QueryClient();
+
+// ReactDOM.render(
+//   <QueryClientProvider client={queryClient}>
+//     <App />
+//   </QueryClientProvider>,
+//   document.getElementById('root')
+// );
+

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import Course from './Course';
+import CourseForm from './CourseForm';
+import CoursePlanModal from './CoursePlanModal';
 import Modal from './Modal';
+import TermSelector from './TermSelector';
 import { hasTimeConflict } from '../../utils/conflicts';
 
 
@@ -34,7 +37,7 @@ const CourseList = ({ courses }) => {
     );
   };
 
-  const openModal = () => {
+  const openCoursePlanModal = () => {
     setModalOpen(true);
     console.log('Modal Opened:', modalOpen); // Debugging: Ensure modal state is changing
   };
@@ -47,25 +50,24 @@ const CourseList = ({ courses }) => {
   const handleEdit = (course) => {
     setEditingCourse(course);
     setFormData({ title: course.title, meets: course.meets });
-    openModal();
+    setModalOpen(true);
   }
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+  const handleCourseFormSubmit = (updatedCourse) => {
+    console.log('Updated Course:', updatedCourse); // Update course logic here
+    closeModal();
   };
 
   const handleCancel = () => {
     closeModal();
   }
 
-  const selectedCourseDetails = termCourses.filter(course => selectedCourses.includes(course.number));
-
   return (
     <>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <TermSelector term={term} setTerm={setTerm} />
-        <button className="btn btn-primary" onClick={openModal}>
+        <button className="btn btn-primary" onClick={openCoursePlanModal}>
           Course Plan
         </button>
       </div>
@@ -83,39 +85,23 @@ const CourseList = ({ courses }) => {
         ))}
       </div>
 
-      <Modal open={modalOpen} close={closeModal}>
+      {/* Use CoursePlanModal for displaying selected courses */}
+      <CoursePlanModal
+        modalOpen={modalOpen && !editingCourse} // Open only when not editing a course
+        closeModal={closeModal}
+        selectedCourses={selectedCourses}
+        selectedCourseDetails={termCourses.filter(course => selectedCourses.includes(course.number))}
+      />
+
+      {/* Modal for editing a course */}
+      <Modal open={modalOpen && editingCourse} close={closeModal}>
         {editingCourse ? (
-          <div>
-            <h3>Edit Course</h3>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <div className="mb-3">
-                <label htmlFor="courseTitle" className="form-label">Course Title</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="courseTitle"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="courseMeets" className="form-label">Meeting Time</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="courseMeets"
-                  name="meets"
-                  value={formData.meets}
-                  onChange={handleInputChange}
-                />
-              </div>
-              {/* Cancel button */}
-              <button type="button" className="btn btn-secondary" onClick={handleCancel}>
-                Cancel
-              </button>
-            </form>
-          </div>
+          <CourseForm 
+            course={editingCourse}
+            formData={formData}
+            onSubmit={handleCourseFormSubmit}
+            onCancel={handleCancel}
+          />
         ) : (
           <div>
             <h3>No course selected for editing</h3>
@@ -126,30 +112,4 @@ const CourseList = ({ courses }) => {
   );
 };
 
-const TermButton = ({term, setTerm, checked}) => (
-  <>
-  <input type="radio" id={term} className='btn-check' checked={checked} autoComplete='off'
-    onChange={ () => setTerm(term)} />
-  <label className='btn btn-success m-1 p-2' htmlFor={term}>
-    {term}
-    </label>
-  </>
-);
-const TermSelector = ({term, setTerm}) => {
-  const terms = ['Fall', 'Winter', 'Spring'];
-
-  return (
-    <div className="btn-group">
-      {
-        Object.values(terms).map(value => (
-        <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
-        ))
-      }
-    </div>
-  );
-};
-
-
-
 export default CourseList;
-

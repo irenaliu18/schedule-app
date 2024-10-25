@@ -1,54 +1,44 @@
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
-const CourseForm = ({ courses }) => {
-  const { id } = useParams(); // get course ID from the route
-  const course = courses[id]; // find course by ID (in edit mode)
+const CourseForm = ({ course, onSubmit, onCancel }) => {
 
   const [title, setTitle] = useState(course ? course.title : '');
-  const [term, setTerm] = useState(course ? course.term : '');
   const [meets, setMeets] = useState(course ? course.meets : '');
-
-  const [titleError, setTitleError] = useState('');
-  const [meetsError, setMeetsError] = useState('');
+  const [errors, setErrors] = useState({});
   
-  const navigate = useNavigate();
-
-  const isValidMeetingTime = (meets) => {
-    if (meets === '') return true;
-    const meetsRegex = /^[MTWRF]{1,5} \d{1,2}:\d{2}-\d{1,2}:\d{2}$/;
-    return meetsRegex.test(meets);
-  };
+  // Initialize form data when course is passed in
+  useEffect(() => {
+    if (course) {
+      setTitle(course.title || '');
+      setMeets(course.meets || '');
+    }
+  }, [course]);
 
   const validateForm = () => {
-    let valid = true;
+    const newErrors = {};
 
+    // Validate title (must be at least 2 characters)
     if (title.length < 2) {
-      setTitleError('Title must be at least 2 characters.');
-      valid = false;
-    } else {
-      setTitleError('');
+      newErrors.title = "Title must be at least 2 characters long.";
     }
 
-    if (!isValidMeetingTime(meets)){
-      setMeetsError('Must contain days and start-end, e.g., MWF 12:00 - 13:20');
-      valid = false;
-    } else {
-      setMeetsError('');
+    // Validate meeting time
+    const meetsPattern = /^[MTWRF]{1,5}\s+\d{2}:\d{2}-\d{2}:\d{2}$/;
+    if (meets && !meetsPattern.test(meets)) {
+      newErrors.meets = "Meeting time must be in format, e.g., 'MWF 12:00-13:20'.";
     }
-    return valid;
-  };
 
-  
-  const handleCancel = () => {
-    navigate('/'); // return to the course list when cancel is clicked
+    setErrors(newErrors);
+
+    // If no errors, return true, else false
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Form submitted with:', { title, term, meets });
-      navigate('/');
+      const updatedCourse = { ...course, title, meets };
+      onSubmit(updatedCourse); // Pass updated course data back to parent
     }
   };
 
@@ -58,40 +48,32 @@ const CourseForm = ({ courses }) => {
         <label>Title</label>
         <input 
           type="text" 
-          className="form-control"
+          className={`form-control ${errors.title ? 'is-invalid' : ''}`}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        {titleError && <div className="text-danger">{titleError}</div>} {/* Display error */}
+        {errors.title && <div className="invalid-feedback">{errors.title}</div>}
       </div>
-      <div className="form-group">
-        <label>Term</label>
-        <input 
-          type="text" 
-          className="form-control"
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-        />
-      </div>
+
       <div className="form-group">
         <label>Meeting Times</label>
         <input 
           type="text" 
-          className="form-control"
+          className={`form-control ${errors.meets ? 'is-invalid' : ''}`}
           value={meets}
           onChange={(e) => setMeets(e.target.value)}
         />
-        {meetsError && <div className="text-danger">{meetsError}</div>} {/* Display error */}
+        {errors.meets && <div className="invalid-feedback">{errors.meets}</div>}
       </div>
 
-      <div className="button-group" style={{ marginTop: '20px' }}>
-  <button type="submit" className="btn btn-primary">
-    Submit
-  </button>
-  <button type="button" className="btn btn-secondary" onClick={handleCancel}>
-    Cancel
-  </button>
-</div>
+      <div className="d-flex justify-content-between mt-3">
+        <button type="button" className="btn btn-secondary" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="submit" className="btn btn-primary">
+          Submit
+        </button>
+      </div>
     </form>
   );
 };
