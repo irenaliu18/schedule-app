@@ -15,7 +15,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -37,6 +37,31 @@
     transform: rotate(360deg);
   }
 }
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+  width: 100%;
+}
+
+.banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+  width: 100%;
+}
+
+.banner h1 {
+  margin: 0;
+  font-size: calc(16px + 2vmin); /* Responsive font size */
+  color: #020303; /* Matches link color in App */
+}
+
+.banner button:hover {
+  background-color: #ffffff; /* Slightly darker hover color */
+}
+
 
 button {
   font-size: calc(10px + 2vmin);
