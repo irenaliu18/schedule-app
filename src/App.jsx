@@ -1,4 +1,6 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { onValue, ref} from 'firebase/database';
+import { database } from '../utilities/firebase'
 import './styling/App.css';
 import React from 'react';
 import { Routes, Route } from 'react-router-dom'; // Import from react-router-dom
@@ -9,10 +11,21 @@ import CourseForm from './components/CourseForm';
 
 // Fetch the schedule data
 const fetchSchedule = async () => {
-  const url = 'https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php';
-  const response = await fetch(url);
-  if (!response.ok) throw response;
-  return await response.json();
+  const dbRef = ref(database, 'courses'); // Assuming 'courses' is the path in your database
+  const snapshot = await new Promise((resolve, reject) => {
+    onValue(dbRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        console.log('Fetched data from Firebase:', data); // Inspect fetched data
+        resolve(data);
+      } else {
+        reject('No data available');
+      }
+    }, {
+      onlyOnce: true // Only listen for one event and then stop
+    });
+  });
+  return snapshot;
 };
 
 // Main component
@@ -28,11 +41,12 @@ const Main = () => {
   // Handle error state
   if (error) return <h1>{error.message || 'Error loading the schedule'}</h1>;
 
+  console.log('Fetched schedule', schedule);
   // Render content once the data is available
   return (
     <div className="container">
       <Banner title={schedule.title} />
-      <CourseList courses={schedule.courses} />
+      <CourseList courses={schedule} />
     </div>
   );
 };

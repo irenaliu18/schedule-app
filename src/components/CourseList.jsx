@@ -4,10 +4,18 @@ import CourseForm from './CourseForm';
 import CoursePlanModal from './CoursePlanModal';
 import Modal from './Modal';
 import TermSelector from './TermSelector';
-import { hasTimeConflict } from '../../utils/conflicts';
+import { hasTimeConflict } from '../../utilities/conflicts';
+import { database } from '../../utilities/firebase';
+import { ref, update } from 'firebase/database'; // Make sure these are imported
+
 
 
 const CourseList = ({ courses }) => {
+  if (!courses) {
+    console.error('Courses prop is not defined:', courses);
+    return <div>No courses available</div>; // or any fallback UI
+  }
+
   const [term, setTerm] = useState('Fall');
   const [selectedCourses, setSelectedCourses] = useState([]); 
   const [modalOpen, setModalOpen] = useState(false);
@@ -48,6 +56,7 @@ const CourseList = ({ courses }) => {
   };
 
   const handleEdit = (course) => {
+    console.log('Editing Course:', course);
     setEditingCourse(course);
     setFormData({ title: course.title, meets: course.meets });
     setModalOpen(true);
@@ -55,7 +64,17 @@ const CourseList = ({ courses }) => {
 
 
   const handleCourseFormSubmit = (updatedCourse) => {
-    console.log('Updated Course:', updatedCourse); // Update course logic here
+    const dbRef = ref(database, `courses/${updatedCourse.number}`); // Assuming number is unique
+    update(dbRef, {
+      title: updatedCourse.title,
+      meets: updatedCourse.meets,
+      lastUpdated: Date.now() // You can add a timestamp here if needed
+    }).then(() => {
+      console.log('Course updated successfully');
+    }).catch((error) => {
+      console.error('Error updating course:', error);
+    });
+  
     closeModal();
   };
 
