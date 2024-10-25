@@ -5,12 +5,13 @@ import CoursePlanModal from './CoursePlanModal';
 import Modal from './Modal';
 import TermSelector from './TermSelector';
 import { hasTimeConflict } from '../../utilities/conflicts';
-import { database } from '../../utilities/firebase';
+import { database, useAuth } from '../../utilities/firebase';
+
 import { ref, update } from 'firebase/database'; // Make sure these are imported
 
-
-
 const CourseList = ({ courses }) => {
+  const user = useAuth();
+
   if (!courses) {
     console.error('Courses prop is not defined:', courses);
     return <div>No courses available</div>; // or any fallback UI
@@ -56,19 +57,20 @@ const CourseList = ({ courses }) => {
   };
 
   const handleEdit = (course) => {
+    
+    if (!user) return alert('Please sign in to edit courses.');
     console.log('Editing Course:', course);
     setEditingCourse(course);
     setFormData({ title: course.title, meets: course.meets });
     setModalOpen(true);
   }
 
-
   const handleCourseFormSubmit = (updatedCourse) => {
     const dbRef = ref(database, `courses/${updatedCourse.number}`); // Assuming number is unique
+    console.log('Updated Course', updatedCourse.number);
     update(dbRef, {
       title: updatedCourse.title,
       meets: updatedCourse.meets,
-      lastUpdated: Date.now() // You can add a timestamp here if needed
     }).then(() => {
       console.log('Course updated successfully');
     }).catch((error) => {
@@ -81,6 +83,7 @@ const CourseList = ({ courses }) => {
   const handleCancel = () => {
     closeModal();
   }
+
 
   return (
     <>
@@ -100,6 +103,7 @@ const CourseList = ({ courses }) => {
             selectable={isSelectable(course)}
             toggleSelected={() => toggleSelected(course)}
             handleEdit={handleEdit}
+            //user={user}
           />
         ))}
       </div>

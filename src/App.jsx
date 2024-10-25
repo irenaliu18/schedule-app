@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { onValue, ref} from 'firebase/database';
-import { database } from '../utilities/firebase'
+import { database, useAuth } from '../utilities/firebase'
 import './styling/App.css';
 import React from 'react';
 import { Routes, Route } from 'react-router-dom'; // Import from react-router-dom
+
 import Banner from './components/Banner';
 import CourseList from './components/CourseList';
 import CourseForm from './components/CourseForm';
@@ -30,6 +31,7 @@ const fetchSchedule = async () => {
 
 // Main component
 const Main = () => {
+  const user = useAuth();
   const { data: schedule, isLoading, error } = useQuery({
     queryKey: ['schedule'],
     queryFn: fetchSchedule

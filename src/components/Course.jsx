@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-
+import { useAuth } from '../../utilities/firebase';
 const Course = ({ course, selected, toggleSelected, selectable, handleEdit }) => {
-
+    const user = useAuth();
     const [isHovered, setIsHovered] = useState(false);
     
     return (
@@ -17,7 +17,7 @@ const Course = ({ course, selected, toggleSelected, selectable, handleEdit }) =>
                 <div className='card-text'>{course.title}</div>
                 <div className='card-text'>{course.meets}</div>
 
-                {isHovered && (
+                {isHovered && user && (
                     <button className="btn btn-primary" onClick={() => handleEdit(course)}>
                         Edit
                     </button>

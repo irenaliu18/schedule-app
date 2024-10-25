@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, onValue, ref, update } from "firebase/database";
 import { useEffect, useState } from "react";
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+
 
 
 
@@ -16,10 +18,24 @@ const firebaseConfig = {
     measurementId: "G-ZD8E4JZG9V"
   };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-export { database };
+export const signInWithGoogle = () => signInWithPopup(auth, provider);
+export const firebaseSignOut = () => signOut(auth);
+
+// Custom hook to manage user state
+export const useAuth = () => {
+    const [user, setUser] = useState(null);
+  
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => setUser(user || null));
+      return unsubscribe;
+    }, []);
+  
+    return user;
+  };
+
+export { database, auth};
